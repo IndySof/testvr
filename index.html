@@ -3,22 +3,33 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>VR Room with Whiteboard</title>
+  <title>VR Room with Movement</title>
   <script src="https://aframe.io/releases/1.4.1/aframe.min.js"></script>
 </head>
 <body>
 <a-scene>
-  <!-- Camera setup with adjusted height -->
-  <a-entity id="cameraRig" position="0 1 0">
-    <a-entity id="camera" camera look-controls></a-entity>
+  <!-- Camera rig with wasd-controls for movement -->
+  <a-entity id="cameraRig" position="0 1 0" movement-controls>
+    <a-entity
+      id="camera"
+      camera
+      wasd-controls="acceleration: 10"
+      look-controls>
+    </a-entity>
 
     <!-- Left controller -->
-    <a-entity id="leftHand" laser-controls="hand: left"
-              oculus-touch-controls="hand: left"></a-entity>
+    <a-entity
+      id="leftHand"
+      laser-controls="hand: left"
+      oculus-touch-controls="hand: left">
+    </a-entity>
 
     <!-- Right controller -->
-    <a-entity id="rightHand" laser-controls="hand: right"
-              oculus-touch-controls="hand: right"></a-entity>
+    <a-entity
+      id="rightHand"
+      laser-controls="hand: right"
+      oculus-touch-controls="hand: right">
+    </a-entity>
   </a-entity>
 
   <!-- Room walls -->
@@ -42,13 +53,13 @@
     <a-light
       type="spot"
       intensity="1.5"
-      position="0 4 -4"
-      angle="45"
+      position="0 3 0"
+      angle="60"
       target="#whiteboard"
       color="#fffae6">
     </a-light>
     <a-text
-      value="Bienvenue dans la salle immersive !\nAppuyez sur un bouton pour quitter."
+      value="Bienvenue dans la salle immersive !\nUtilisez les flèches ou le joystick pour vous déplacer."
       align="center"
       width="3.8"
       position="0 0 0.1"
@@ -56,10 +67,20 @@
     </a-text>
   </a-plane>
 
+  <!-- Decorations -->
+  <!-- A plant in the corner -->
+  <a-cylinder position="-5 0.5 -6" radius="0.2" height="1" color="#8B4513"></a-cylinder>
+  <a-cone position="-5 1.5 -6" radius-bottom="0.5" radius-top="0.1" height="1" color="#228B22"></a-cone>
+
+  <!-- A table with a book -->
+  <a-cylinder position="3 0.4 -3" radius="0.5" height="0.1" color="#6b4f4f"></a-cylinder>
+  <a-box position="3 0.5 -3" width="0.4" height="0.1" depth="0.3" color="#FFD700"></a-box>
+
+  <!-- A painting on the wall -->
+
   <!-- Lights -->
   <a-light type="ambient" intensity="0.5" color="#ffffff"></a-light>
-  <a-light type="point" intensity="0.8" color="#ff9d76" position="-4 2 -6"></a-light>
-  <a-light type="point" intensity="0.8" color="#ff6e6e" position="4 2 -6"></a-light>
+  <a-light type="point" intensity="1" color="#ffffff" position="0 3 2" target="#whiteboard"></a-light>
 
   <!-- Sky -->
   <a-sky color="#87CEEB"></a-sky>
