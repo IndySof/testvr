@@ -9,14 +9,16 @@
 <body>
 <a-scene>
   <!-- Camera setup with adjusted height -->
-  <a-entity id="cameraRig" position="0 1.2 0">
+  <a-entity id="cameraRig" position="0 1 0">
     <a-entity id="camera" camera look-controls></a-entity>
 
     <!-- Left controller -->
-    <a-entity id="leftHand" laser-controls="hand: left"></a-entity>
+    <a-entity id="leftHand" laser-controls="hand: left"
+              oculus-touch-controls="hand: left"></a-entity>
 
     <!-- Right controller -->
-    <a-entity id="rightHand" laser-controls="hand: right"></a-entity>
+    <a-entity id="rightHand" laser-controls="hand: right"
+              oculus-touch-controls="hand: right"></a-entity>
   </a-entity>
 
   <!-- Room walls -->
@@ -46,7 +48,7 @@
       color="#fffae6">
     </a-light>
     <a-text
-      value="Bienvenue dans la salle immersive !\nAppuyez sur X pour quitter."
+      value="Bienvenue dans la salle immersive !\nAppuyez sur un bouton pour quitter."
       align="center"
       width="3.8"
       position="0 0 0.1"
@@ -64,21 +66,26 @@
 
   <!-- Exit VR functionality -->
   <script>
-    // Handle VR controller button X
-    document.querySelector('a-scene').addEventListener('buttondown', (event) => {
-      const { id, hand } = event.detail;
-      if (id === 'X') {
-        // Exit VR experience
-        if (document.exitFullscreen) {
-          document.exitFullscreen();
-        }
-        if (document.webkitExitFullscreen) {
-          document.webkitExitFullscreen();
-        }
-      }
+    // Exit VR on controller button press
+    AFRAME.registerComponent('exit-on-button', {
+      init: function () {
+        this.el.addEventListener('triggerdown', function () {
+          // Exit VR experience
+          if (document.exitFullscreen) {
+            document.exitFullscreen();
+          }
+          if (document.webkitExitFullscreen) {
+            document.webkitExitFullscreen();
+          }
+        });
+      },
     });
 
-    // Fallback for keyboards
+    // Attach the component to the controllers
+    document.querySelector('#leftHand').setAttribute('exit-on-button', '');
+    document.querySelector('#rightHand').setAttribute('exit-on-button', '');
+
+    // Fallback for keyboard
     document.addEventListener('keydown', function (event) {
       if (event.code === "KeyX") {
         if (document.exitFullscreen) {
