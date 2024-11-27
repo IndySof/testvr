@@ -17,7 +17,7 @@
       id="leftHand"
       laser-controls="hand: left"
       oculus-touch-controls="hand: left"
-      color-changer="side: left">
+      bind-controls>
     </a-entity>
 
     <!-- Right controller -->
@@ -94,7 +94,29 @@
         let colorIndexLeft = 0;
         let colorIndexRight = 0;
 
-        // Bind right controller buttons
+        // Change colors with triggerdown on left hand (previous color)
+        if (this.el.id === 'leftHand') {
+          this.el.addEventListener('triggerdown', function () {
+            colorIndexLeft = (colorIndexLeft - 1 + colors.length) % colors.length;
+            colorIndexRight = (colorIndexRight - 1 + colors.length) % colors.length;
+
+            whiteboardLeft.setAttribute('color', colors[colorIndexLeft]);
+            whiteboardRight.setAttribute('color', colors[colorIndexRight]);
+          });
+        }
+
+        // Change colors with triggerdown on right hand (next color)
+        if (this.el.id === 'rightHand') {
+          this.el.addEventListener('triggerdown', function () {
+            colorIndexLeft = (colorIndexLeft + 1) % colors.length;
+            colorIndexRight = (colorIndexRight + 1) % colors.length;
+
+            whiteboardLeft.setAttribute('color', colors[colorIndexLeft]);
+            whiteboardRight.setAttribute('color', colors[colorIndexRight]);
+          });
+        }
+
+        // Bind buttons on right controller
         this.el.addEventListener('abuttondown', function () {
           // Show Monoyer chart and hide whiteboards
           whiteboardLeft.setAttribute('visible', "false");
@@ -107,16 +129,6 @@
           whiteboardLeft.setAttribute('visible', "true");
           whiteboardRight.setAttribute('visible', "true");
           monoyerChart.setAttribute('visible', "false");
-        });
-
-        // Bind trigger to change colors
-        this.el.addEventListener('triggerdown', function () {
-          // Change colors of the boards
-          colorIndexLeft = (colorIndexLeft + 1) % colors.length;
-          colorIndexRight = (colorIndexRight + 1) % colors.length;
-
-          whiteboardLeft.setAttribute('color', colors[colorIndexLeft]);
-          whiteboardRight.setAttribute('color', colors[colorIndexRight]);
         });
       }
     });
