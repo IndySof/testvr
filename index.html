@@ -1,28 +1,103 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>My First A-Frame Scene Test</title>
-  <script src="https://aframe.io/releases/1.2.0/aframe.min.js"></script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>VR Room with Whiteboard</title>
+  <script src="https://aframe.io/releases/1.4.1/aframe.min.js"></script>
 </head>
 <body>
 <a-scene>
-  <!-- Ajoute un ciel -->
-  <a-sky color="#ECECEC"></a-sky>
+  <!-- Camera setup -->
+  <a-entity id="cameraRig" position="0 1.6 0">
+    <a-entity id="camera" camera look-controls></a-entity>
 
-  <!-- Ajoute une boîte au centre -->
-  <a-box position="0 1 -3" rotation="0 45 0" color="#4CC3D9"></a-box>
+    <!-- Left controller -->
+    <a-entity id="leftHand" laser-controls="hand: left"></a-entity>
 
-  <!-- Ajoute un sol -->
-  <a-plane position="0 0 -4" rotation="-90 0 0" width="10" height="10" color="#7BC8A4"></a-plane>
+    <!-- Right controller -->
+    <a-entity id="rightHand" laser-controls="hand: right"></a-entity>
+  </a-entity>
 
-  <!-- Ajoute une sphère -->
-  <a-sphere position="2 1 -4" radius="1.25" color="#EF2D5E"></a-sphere>
+  <!-- Room walls -->
+  <a-box
+    position="0 1.5 -5"
+    width="12"
+    height="3"
+    depth="12"
+    color="#2e2e2e"
+    material="side: double;">
+  </a-box>
 
-  <!-- Ajoute une caméra -->
-  <a-camera position="0 1.6 0">
-    <a-cursor></a-cursor>
-  </a-camera>
+  <!-- Floor with red color -->
+  <a-plane
+    position="0 0 -5"
+    width="12"
+    height="12"
+    rotation="-90 0 0"
+    color="red">
+  </a-plane>
+
+  <!-- Whiteboard -->
+  <a-plane
+    id="whiteboard"
+    position="0 2 -4"
+    width="4"
+    height="2.5"
+    color="#ffffff"
+    shadow="cast: true">
+    <a-light
+      type="spot"
+      intensity="1.5"
+      position="0 4 -4"
+      angle="45"
+      target="#whiteboard"
+      color="#fffae6">
+    </a-light>
+    <a-text
+      value="Bienvenue dans la salle immersive !\nAppuyez sur X pour quitter."
+      align="center"
+      width="3.8"
+      position="0 0 0.1"
+      color="#000000">
+    </a-text>
+  </a-plane>
+
+  <!-- Lights -->
+  <a-light type="ambient" intensity="0.5" color="#ffffff"></a-light>
+  <a-light type="point" intensity="0.8" color="#ff9d76" position="-4 2 -6"></a-light>
+  <a-light type="point" intensity="0.8" color="#ff6e6e" position="4 2 -6"></a-light>
+
+  <!-- Sky -->
+  <a-sky color="#87CEEB"></a-sky>
+
+  <!-- Exit VR functionality -->
+  <script>
+    document.addEventListener('gamepadbuttondown', function (event) {
+      const gamepad = event.detail.index; // Detect button press
+      if (gamepad === 3) { // Button X on most VR controllers
+        // Exit VR experience
+        if (document.exitFullscreen) {
+          document.exitFullscreen();
+        }
+        if (document.webkitExitFullscreen) {
+          document.webkitExitFullscreen();
+        }
+      }
+    });
+
+    // Fallback for keyboards
+    document.addEventListener('keydown', function (event) {
+      if (event.code === "KeyX") {
+        if (document.exitFullscreen) {
+          document.exitFullscreen();
+        }
+        if (document.webkitExitFullscreen) {
+          document.webkitExitFullscreen();
+        }
+      }
+    });
+  </script>
 </a-scene>
 </body>
 </html>
