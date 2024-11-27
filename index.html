@@ -8,12 +8,13 @@
 </head>
 <body>
 <a-scene>
-  <!-- Camera rig with wasd-controls for movement -->
+  <!-- Camera rig with thumbstick-controls for movement -->
   <a-entity id="cameraRig" position="0 1 0" movement-controls>
     <a-entity
       id="camera"
       camera
       wasd-controls="acceleration: 10"
+      thumbstick-controls="enabled: true"
       look-controls>
     </a-entity>
 
@@ -59,7 +60,7 @@
       color="#fffae6">
     </a-light>
     <a-text
-      value="Bienvenue dans la salle immersive !\nUtilisez les flèches ou le joystick pour vous déplacer."
+      value="Bienvenue dans la salle immersive !\nUtilisez les flèches, WASD ou le joystick pour vous déplacer."
       align="center"
       width="3.8"
       position="0 0 0.1"
