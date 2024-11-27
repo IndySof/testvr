@@ -25,7 +25,7 @@
       id="rightHand"
       laser-controls="hand: right"
       oculus-touch-controls="hand: right"
-      color-changer="side: right">
+      bind-controls>
     </a-entity>
   </a-entity>
 
@@ -103,6 +103,29 @@
           this.colorIndex = (this.colorIndex + 1) % this.colors.length;
         }
         this.whiteboard.setAttribute('color', this.colors[this.colorIndex]);
+      }
+    });
+
+    AFRAME.registerComponent('bind-controls', {
+      init: function () {
+        const whiteboardLeft = document.querySelector('#whiteboard-left');
+        const whiteboardRight = document.querySelector('#whiteboard-right');
+        const monoyerChart = document.querySelector('#monoyer-chart');
+
+        // Bind right controller buttons
+        this.el.addEventListener('abuttondown', function () {
+          // Show Monoyer chart and hide whiteboards
+          whiteboardLeft.setAttribute('visible', "false");
+          whiteboardRight.setAttribute('visible', "false");
+          monoyerChart.setAttribute('visible', "true");
+        });
+
+        this.el.addEventListener('bbuttondown', function () {
+          // Show whiteboards and hide Monoyer chart
+          whiteboardLeft.setAttribute('visible', "true");
+          whiteboardRight.setAttribute('visible', "true");
+          monoyerChart.setAttribute('visible', "false");
+        });
       }
     });
 
