@@ -8,8 +8,8 @@
 </head>
 <body>
 <a-scene>
-  <!-- Camera setup -->
-  <a-entity id="cameraRig" position="0 1.6 0">
+  <!-- Camera setup with adjusted height -->
+  <a-entity id="cameraRig" position="0 1.2 0">
     <a-entity id="camera" camera look-controls></a-entity>
 
     <!-- Left controller -->
@@ -28,15 +28,6 @@
     color="#2e2e2e"
     material="side: double;">
   </a-box>
-
-  <!-- Floor with red color -->
-  <a-plane
-    position="0 0 -5"
-    width="12"
-    height="12"
-    rotation="-90 0 0"
-    color="red">
-  </a-plane>
 
   <!-- Whiteboard -->
   <a-plane
@@ -73,9 +64,10 @@
 
   <!-- Exit VR functionality -->
   <script>
-    document.addEventListener('gamepadbuttondown', function (event) {
-      const gamepad = event.detail.index; // Detect button press
-      if (gamepad === 3) { // Button X on most VR controllers
+    // Handle VR controller button X
+    document.querySelector('a-scene').addEventListener('buttondown', (event) => {
+      const { id, hand } = event.detail;
+      if (id === 'X') {
         // Exit VR experience
         if (document.exitFullscreen) {
           document.exitFullscreen();
@@ -93,7 +85,7 @@
           document.exitFullscreen();
         }
         if (document.webkitExitFullscreen) {
-          document.webkitExitFullscreen();
+          document.exitFullscreen();
         }
       }
     });
