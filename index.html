@@ -111,6 +111,24 @@
         const whiteboardLeft = document.querySelector('#whiteboard-left');
         const whiteboardRight = document.querySelector('#whiteboard-right');
         const monoyerChart = document.querySelector('#monoyer-chart');
+        const colors = [
+          '#ffcccc', '#ff9999', '#ff6666', '#ff3333', '#ff0000',
+          '#ccffcc', '#99ff99', '#66ff66', '#33ff33', '#00ff00',
+          '#ccccff', '#9999ff', '#6666ff', '#3333ff', '#0000ff',
+          '#ffffcc', '#ffff99', '#ffff66', '#ffff33', '#ffff00'
+        ];
+
+        let colorIndexLeft = 0;
+        let colorIndexRight = 0;
+
+        // Bind trigger down for color changes (right trigger -> D behavior)
+        this.el.addEventListener('triggerdown', function () {
+          colorIndexLeft = (colorIndexLeft + 1) % colors.length;
+          colorIndexRight = (colorIndexRight + 1) % colors.length;
+
+          whiteboardLeft.setAttribute('color', colors[colorIndexLeft]);
+          whiteboardRight.setAttribute('color', colors[colorIndexRight]);
+        });
 
         // Bind right controller buttons
         this.el.addEventListener('abuttondown', function () {
