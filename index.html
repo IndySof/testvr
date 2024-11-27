@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>VR Room with Trigger-Controlled Color Change</title>
+  <title>VR Book-Style Whiteboard</title>
   <script src="https://aframe.io/releases/1.4.1/aframe.min.js"></script>
 </head>
 <body>
@@ -17,7 +17,7 @@
       id="leftHand"
       laser-controls="hand: left"
       oculus-touch-controls="hand: left"
-      color-changer="direction: previous">
+      color-changer="side: left">
     </a-entity>
 
     <!-- Right controller -->
@@ -25,7 +25,7 @@
       id="rightHand"
       laser-controls="hand: right"
       oculus-touch-controls="hand: right"
-      color-changer="direction: next">
+      color-changer="side: right">
     </a-entity>
   </a-entity>
 
@@ -39,27 +39,22 @@
     material="side: double;">
   </a-box>
 
-  <!-- Whiteboard -->
-  <a-plane
-    id="whiteboard"
-    position="0 2 -4"
-    width="4"
-    height="2.5"
-    color="#ffffff"
-    shadow="cast: true">
-    <a-light
-      type="spot"
-      intensity="1.5"
-      position="0 3 0"
-      angle="60"
-      target="#whiteboard"
-      color="#fffae6">
-    </a-light>
+  <!-- Whiteboard split into two pages, without separation -->
+  <a-plane id="whiteboard-left" position="-1 2 -4" width="2" height="3" color="#ffcccc">
     <a-text
-      id="whiteboard-text"
-      value="Appuyez sur A/D ou les gâchettes pour changer la couleur."
+      value="Lorem ipsum dolor sit amet, consectetur adipiscing elit. \n\nVivamus commodo, felis in aliquam posuere, tortor nisl gravida augue, \nsed euismod sem nulla sed ligula. \n\nDonec vitae lacinia eros. \nSuspendisse potenti. Pellentesque id dolor felis. \nMaecenas ultricies, augue in sodales vehicula, magna nulla \npellentesque sem, non venenatis orci justo non mi. \n\nProin dictum lacus eget tellus tempor malesuada. Sed nec\njusto a urna consectetur viverra. Integer non lectus magna.\nFusce id quam ultricies, facilisis ex vel, fermentum est."
       align="center"
-      width="3.8"
+      width="1.8"
+      position="0 0 0.1"
+      color="#000000">
+    </a-text>
+  </a-plane>
+
+  <a-plane id="whiteboard-right" position="1 2 -4" width="2" height="3" color="#ccccff">
+    <a-text
+      value="Praesent eu justo feugiat, tempor ligula nec, tincidunt ligula. \n\nCurabitur vel suscipit sapien. Phasellus auctor dictum sapien, at \naliquam purus faucibus sed. \n\nNullam imperdiet vestibulum nulla, non lacinia odio laoreet a. \nDonec pharetra nisi quis ex rhoncus luctus. Integer nec \nsemper mi. Nulla vestibulum vehicula quam. \n\nAliquam erat volutpat. Integer non urna id \nmassa cursus iaculis. Proin a augue dapibus, efficitur felis vitae,\nvolutpat justo. Nam pellentesque placerat arcu nec consequat."
+      align="center"
+      width="1.8"
       position="0 0 0.1"
       color="#000000">
     </a-text>
@@ -76,40 +71,53 @@
   <script>
     AFRAME.registerComponent('color-changer', {
       schema: {
-        direction: {type: 'string', default: 'next'}
+        side: {type: 'string', default: 'left'} // Side to change: 'left' or 'right'
       },
       init: function () {
-        this.colorIndex = 0; // Start with the first color
-        this.colors = ['#ffffff', '#ff0000', '#00ff00', '#0000ff', '#ffff00', '#ff00ff', '#00ffff'];
-        this.whiteboard = document.querySelector('#whiteboard');
+        this.colorIndex = 0;
+        this.colors = [
+          '#ffcccc', '#ff9999', '#ff6666', '#ff3333', '#ff0000',
+          '#ccffcc', '#99ff99', '#66ff66', '#33ff33', '#00ff00',
+          '#ccccff', '#9999ff', '#6666ff', '#3333ff', '#0000ff',
+          '#ffffcc', '#ffff99', '#ffff66', '#ffff33', '#ffff00'
+        ];
+        this.whiteboard = document.querySelector(
+          this.data.side === 'left' ? '#whiteboard-left' : '#whiteboard-right'
+        );
         this.el.addEventListener('triggerdown', this.changeColor.bind(this));
       },
       changeColor: function () {
-        if (this.data.direction === 'next') {
-          this.colorIndex = (this.colorIndex + 1) % this.colors.length; // Next color
-        } else if (this.data.direction === 'previous') {
-          this.colorIndex = (this.colorIndex - 1 + this.colors.length) % this.colors.length; // Previous color
-        }
+        this.colorIndex = (this.colorIndex + 1) % this.colors.length;
         this.whiteboard.setAttribute('color', this.colors[this.colorIndex]);
       }
     });
 
     // Keyboard controls for color changing
     document.addEventListener('keydown', function (event) {
-      const whiteboard = document.querySelector('#whiteboard');
-      const colors = ['#ffffff', '#ff0000', '#00ff00', '#0000ff', '#ffff00', '#ff00ff', '#00ffff'];
-      let colorIndex = colors.indexOf(whiteboard.getAttribute('color'));
+      const colors = [
+        '#ffcccc', '#ff9999', '#ff6666', '#ff3333', '#ff0000',
+        '#ccffcc', '#99ff99', '#66ff66', '#33ff33', '#00ff00',
+        '#ccccff', '#9999ff', '#6666ff', '#3333ff', '#0000ff',
+        '#ffffcc', '#ffff99', '#ffff66', '#ffff33', '#ffff00'
+      ];
+      const leftBoard = document.querySelector('#whiteboard-left');
+      const rightBoard = document.querySelector('#whiteboard-right');
+      let colorIndexLeft = colors.indexOf(leftBoard.getAttribute('color'));
+      let colorIndexRight = colors.indexOf(rightBoard.getAttribute('color'));
 
       if (event.key === 'd' || event.key === 'D') {
-        // Next color
-        colorIndex = (colorIndex + 1) % colors.length;
+        // Next color for both
+        colorIndexLeft = (colorIndexLeft + 1) % colors.length;
+        colorIndexRight = (colorIndexRight + 1) % colors.length;
       } else if (event.key === 'a' || event.key === 'A') {
-        // Previous color
-        colorIndex = (colorIndex - 1 + colors.length) % colors.length;
+        // Previous color for both
+        colorIndexLeft = (colorIndexLeft - 1 + colors.length) % colors.length;
+        colorIndexRight = (colorIndexRight - 1 + colors.length) % colors.length;
       }
 
-      // Update the whiteboard color
-      whiteboard.setAttribute('color', colors[colorIndex]);
+      // Update colors
+      leftBoard.setAttribute('color', colors[colorIndexLeft]);
+      rightBoard.setAttribute('color', colors[colorIndexRight]);
     });
   </script>
 </a-scene>
