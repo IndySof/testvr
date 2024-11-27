@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>VR Book-Style Whiteboard</title>
+  <title>VR Acuity Test</title>
   <script src="https://aframe.io/releases/1.4.1/aframe.min.js"></script>
 </head>
 <body>
@@ -25,7 +25,7 @@
       id="rightHand"
       laser-controls="hand: right"
       oculus-touch-controls="hand: right"
-      color-changer="side: right">
+      bind-controls>
     </a-entity>
   </a-entity>
 
@@ -39,7 +39,7 @@
     material="side: double;">
   </a-box>
 
-  <!-- Whiteboard split into two pages, without separation -->
+  <!-- Whiteboard split into two pages -->
   <a-plane id="whiteboard-left" position="-1 2 -4" width="2" height="3" color="#ffcccc">
     <a-text
       value="Lorem ipsum dolor sit amet, consectetur adipiscing elit. \n\nVivamus commodo, felis in aliquam posuere, tortor nisl gravida augue, \nsed euismod sem nulla sed ligula. \n\nDonec vitae lacinia eros. \nSuspendisse potenti. Pellentesque id dolor felis. \nMaecenas ultricies, augue in sodales vehicula, magna nulla \npellentesque sem, non venenatis orci justo non mi. \n\nProin dictum lacus eget tellus tempor malesuada. Sed nec\njusto a urna consectetur viverra. Integer non lectus magna.\nFusce id quam ultricies, facilisis ex vel, fermentum est."
@@ -60,6 +60,16 @@
     </a-text>
   </a-plane>
 
+  <!-- Monoyer Chart -->
+  <a-plane
+    id="monoyer-chart"
+    position="0 2 -10"
+    width="2.5"
+    height="4"
+    visible="false"
+    material="src: ./img/monoyer.jpg;">
+  </a-plane>
+
   <!-- Lights -->
   <a-light type="ambient" intensity="0.5" color="#ffffff"></a-light>
   <a-light type="point" intensity="1" color="#ffffff" position="0 3 2" target="#whiteboard"></a-light>
@@ -67,57 +77,96 @@
   <!-- Sky -->
   <a-sky color="#87CEEB"></a-sky>
 
-  <!-- Color changer logic -->
+  <!-- Logic to bind controls -->
   <script>
-    AFRAME.registerComponent('color-changer', {
-      schema: {
-        side: {type: 'string', default: 'left'} // Side to change: 'left' or 'right'
-      },
+    AFRAME.registerComponent('bind-controls', {
       init: function () {
-        this.colorIndex = 0;
-        this.colors = [
+        const whiteboardLeft = document.querySelector('#whiteboard-left');
+        const whiteboardRight = document.querySelector('#whiteboard-right');
+        const monoyerChart = document.querySelector('#monoyer-chart');
+        const colors = [
           '#ffcccc', '#ff9999', '#ff6666', '#ff3333', '#ff0000',
           '#ccffcc', '#99ff99', '#66ff66', '#33ff33', '#00ff00',
           '#ccccff', '#9999ff', '#6666ff', '#3333ff', '#0000ff',
           '#ffffcc', '#ffff99', '#ffff66', '#ffff33', '#ffff00'
         ];
-        this.whiteboard = document.querySelector(
-          this.data.side === 'left' ? '#whiteboard-left' : '#whiteboard-right'
-        );
-        this.el.addEventListener('triggerdown', this.changeColor.bind(this));
-      },
-      changeColor: function () {
-        this.colorIndex = (this.colorIndex + 1) % this.colors.length;
-        this.whiteboard.setAttribute('color', this.colors[this.colorIndex]);
+
+        let colorIndexLeft = 0;
+        let colorIndexRight = 0;
+
+        // Bind right controller buttons
+        this.el.addEventListener('abuttondown', function () {
+          // Show Monoyer chart and hide whiteboards
+          whiteboardLeft.setAttribute('visible', "false");
+          whiteboardRight.setAttribute('visible', "false");
+          monoyerChart.setAttribute('visible', "true");
+        });
+
+        this.el.addEventListener('bbuttondown', function () {
+          // Show whiteboards and hide Monoyer chart
+          whiteboardLeft.setAttribute('visible', "true");
+          whiteboardRight.setAttribute('visible', "true");
+          monoyerChart.setAttribute('visible', "false");
+        });
+
+        // Bind trigger to change colors
+        this.el.addEventListener('triggerdown', function () {
+          // Change colors of the boards
+          colorIndexLeft = (colorIndexLeft + 1) % colors.length;
+          colorIndexRight = (colorIndexRight + 1) % colors.length;
+
+          whiteboardLeft.setAttribute('color', colors[colorIndexLeft]);
+          whiteboardRight.setAttribute('color', colors[colorIndexRight]);
+        });
       }
     });
 
-    // Keyboard controls for color changing
+    // Keyboard controls
     document.addEventListener('keydown', function (event) {
+      const whiteboardLeft = document.querySelector('#whiteboard-left');
+      const whiteboardRight = document.querySelector('#whiteboard-right');
+      const monoyerChart = document.querySelector('#monoyer-chart');
       const colors = [
         '#ffcccc', '#ff9999', '#ff6666', '#ff3333', '#ff0000',
         '#ccffcc', '#99ff99', '#66ff66', '#33ff33', '#00ff00',
         '#ccccff', '#9999ff', '#6666ff', '#3333ff', '#0000ff',
         '#ffffcc', '#ffff99', '#ffff66', '#ffff33', '#ffff00'
       ];
-      const leftBoard = document.querySelector('#whiteboard-left');
-      const rightBoard = document.querySelector('#whiteboard-right');
-      let colorIndexLeft = colors.indexOf(leftBoard.getAttribute('color'));
-      let colorIndexRight = colors.indexOf(rightBoard.getAttribute('color'));
 
-      if (event.key === 'd' || event.key === 'D') {
-        // Next color for both
-        colorIndexLeft = (colorIndexLeft + 1) % colors.length;
-        colorIndexRight = (colorIndexRight + 1) % colors.length;
-      } else if (event.key === 'a' || event.key === 'A') {
-        // Previous color for both
-        colorIndexLeft = (colorIndexLeft - 1 + colors.length) % colors.length;
-        colorIndexRight = (colorIndexRight - 1 + colors.length) % colors.length;
+      let colorIndexLeft = colors.indexOf(whiteboardLeft.getAttribute('color'));
+      let colorIndexRight = colors.indexOf(whiteboardRight.getAttribute('color'));
+
+      if (event.key === 't' || event.key === 'T') {
+        // Show Monoyer chart and hide whiteboards
+        whiteboardLeft.setAttribute('visible', "false");
+        whiteboardRight.setAttribute('visible', "false");
+        monoyerChart.setAttribute('visible', "true");
       }
 
-      // Update colors
-      leftBoard.setAttribute('color', colors[colorIndexLeft]);
-      rightBoard.setAttribute('color', colors[colorIndexRight]);
+      if (event.key === 'y' || event.key === 'Y') {
+        // Show whiteboards and hide Monoyer chart
+        whiteboardLeft.setAttribute('visible', "true");
+        whiteboardRight.setAttribute('visible', "true");
+        monoyerChart.setAttribute('visible', "false");
+      }
+
+      if (event.key === 'a' || event.key === 'A') {
+        // Change colors to previous
+        colorIndexLeft = (colorIndexLeft - 1 + colors.length) % colors.length;
+        colorIndexRight = (colorIndexRight - 1 + colors.length) % colors.length;
+
+        whiteboardLeft.setAttribute('color', colors[colorIndexLeft]);
+        whiteboardRight.setAttribute('color', colors[colorIndexRight]);
+      }
+
+      if (event.key === 'd' || event.key === 'D') {
+        // Change colors to next
+        colorIndexLeft = (colorIndexLeft + 1) % colors.length;
+        colorIndexRight = (colorIndexRight + 1) % colors.length;
+
+        whiteboardLeft.setAttribute('color', colors[colorIndexLeft]);
+        whiteboardRight.setAttribute('color', colors[colorIndexRight]);
+      }
     });
   </script>
 </a-scene>
